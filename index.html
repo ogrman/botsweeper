@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>botsweeper</title>
+    </head>
+    <style>
+        #game {
+            border: solid 1px black;
+        }
+    </style>
+    <body>
+        <h1>Welcome to homepage</h1>
+        <p>There are no news.</p>
+        <h2>Fight the bots!</h2>
+        <p>
+            Arrow keys, space and F are vital in the fight against bots. R
+            is important when you need to restart the fight.
+        </p>
+        <canvas width="500" height="500" id="game"></canvas>
+        <script src="botsweeper.js"></script>
+        <script>
+            botsweeper(document.getElementById("game"));
+        </script>
+    </body>
+</html>
