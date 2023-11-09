@@ -56,19 +56,57 @@ function botsweeper(canvas) {
     function open() {
         const cell = board[index(width, cursor_x, cursor_y)];
 
+        if (cell.is_flagged) {
+            return;
+        }
+
+        open_cell(cell);
+    }
+
+    function open_cell(cell) {
         if (!cell.is_open) {
             cell.is_open = true;
+            cell.is_flagged = false;
 
             if (cell.is_mined) {
                 dead = true;
             }
+
+            if (cell.neighboring_mines === 0) {
+                for (let i = 0; i < cell.neighbors.length; ++i) {
+                    let neighbor = cell.neighbors[i];
+                    open_cell(neighbor);
+                }
+            }
         }
     }
 
-    function flag() {
-        const cell = board[index(width, cursor_x, cursor_y)];
+    function flag(x, y) {
+        const cell = board[index(width, x, y)];
         if (!cell.is_open) {
             cell.is_flagged = !cell.is_flagged;
+        }
+    }
+
+    function clear(x, y) {
+        const cell = board[index(width, x, y)];
+        if (!cell.is_open) {
+            return;
+        }
+        let flag_count = 0;
+        for (let i = 0; i < cell.neighbors.length; ++i) {
+            const neighbor = cell.neighbors[i];
+            if (neighbor.is_flagged) {
+                flag_count += 1;
+            }
+        }
+        if (flag_count === cell.neighboring_mines) {
+            for (let i = 0; i < cell.neighbors.length; ++i) {
+                const neighbor = cell.neighbors[i];
+                if (!neighbor.is_flagged) {
+                    open_cell(neighbor);
+                }
+            }
         }
     }
 
@@ -104,7 +142,10 @@ function botsweeper(canvas) {
                 opening = true;
                 break;
             case "KeyF":
-                flag();
+                flag(cursor_x, cursor_y);
+                break;
+            case "KeyG":
+                clear(cursor_x, cursor_y);
                 break;
         }
     }
@@ -159,7 +200,7 @@ function botsweeper(canvas) {
                     draw(assets.flag);
                 }
 
-                if (!dead && cursor_x === x && cursor_y === y) {
+                if (cursor_x === x && cursor_y === y) {
                     draw(assets.cursor);
                 }
             }
@@ -180,12 +221,11 @@ function build_board(width, height, mines) {
     for (let y = 0; y < height; ++y) {
         for (let x = 0; x < width; ++x) {
             const cell = {
-                x,
-                y,
                 is_mined: false,
                 is_open: false,
                 is_flagged: false,
                 neighboring_mines: 0,
+                neighbors: [],
             };
 
             if (mines_placed < mines) {
@@ -208,17 +248,11 @@ function build_board(width, height, mines) {
                     const valid_x = n_x >= 0 && n_x < width;
                     const valid_y = n_y >= 0 && n_y < height;
 
-                    if (x === 1 && y === 1) {
-                        console.log("for", x, y, "checking", n_x, n_y, valid_x, valid_y);
-                    }
-
                     if (valid_x && valid_y && !(n_x === x && n_y === y)) {
                         const neighbor = cells[index(width, n_x, n_y)];
+                        cell.neighbors.push(neighbor);
 
                         if (neighbor.is_mined) {
-                            if (x === 1 && y === 1) {
-                                console.log("mine");
-                            }
                             cell.neighboring_mines = cell.neighboring_mines + 1;
                         }
                     }
