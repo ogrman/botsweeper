@@ -170,6 +170,53 @@ function botsweeper(canvas) {
     canvas.addEventListener("keydown", on_key_down, true);
     canvas.addEventListener("keyup", on_key_up, true);
 
+    function on_mouse_move(event) {
+        if (dead) {
+            return;
+        }
+        const { offsetX, offsetY } = event;
+        cursor_x = Math.floor(offsetX / 24);
+        cursor_y = Math.floor(offsetY / 24);
+    }
+
+    function on_mouse_down(event) {
+        if (dead) {
+            return;
+        }
+
+        switch (event.button) {
+            case 0:
+                opening = true;
+                break;
+            case 1:
+                clear(cursor_x, cursor_y);
+                break;
+            case 2:
+                flag(cursor_x, cursor_y);
+                break;
+        }
+    }
+
+    function on_mouse_up(event) {
+        if (dead) {
+            return;
+        }
+
+        switch (event.button) {
+            case 0:
+                opening = false;
+                open();
+                break;
+        }
+    }
+
+    canvas.addEventListener("mousemove", on_mouse_move, true);
+    canvas.addEventListener("mousedown", on_mouse_down, true);
+    canvas.addEventListener("mouseup", on_mouse_up, true);
+    canvas.addEventListener("contextmenu", e => {
+        e.preventDefault();
+    }, true);
+
     function run() {
         for (let y = 0; y < height; ++y) {
             for (let x = 0; x < width; ++x) {
@@ -182,7 +229,7 @@ function botsweeper(canvas) {
 
                 const cell = board[index(width, x, y)];
 
-                if (cell.is_open || cheat) {
+                if (cell.is_open || cheat || dead) {
                     draw(assets.cell_down);
 
                     if (cell.is_mined) {
