@@ -19,12 +19,43 @@
         </p>
         <p>
             You can also use the mouse. Point at the screen, and use the three
-            buttons.
+            mouse buttons.
         </p>
         <canvas width="500" height="500" id="game"></canvas>
+        <div>
+            Select board size:
+            <button id="beginner">Beginner</button>
+            <button id="intermediate">Intermediate</button>
+            <button id="advanced">Advanced</button>
+        </div>
         <script src="botsweeper.js"></script>
         <script>
-            botsweeper(document.getElementById("game"));
+            const beginner = { width: 8, height: 8, mines: 10 };
+            const intermediate = { width: 16, height: 16, mines: 40 };
+            const advanced = { width: 30, height: 16, mines: 99 };
+
+            const canvas = document.getElementById("game");
+
+            const controller = botsweeper(canvas, beginner);
+
+            const start = (parameters) => {
+                controller.start(parameters);
+                canvas.focus();
+            };
+
+            document
+                .getElementById("beginner")
+                .addEventListener("click", () => start(beginner));
+
+            document
+                .getElementById("intermediate")
+                .addEventListener("click", () => start(intermediate));
+
+            document
+                .getElementById("advanced")
+                .addEventListener("click", () => start(advanced));
+
+            start(beginner);
         </script>
     </body>
 </html>

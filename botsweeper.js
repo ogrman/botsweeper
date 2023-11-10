@@ -1,4 +1,7 @@
-function botsweeper(canvas) {
+function botsweeper(canvas, parameters) {
+    canvas.tabIndex = 1000;
+    canvas.style.outline = "none";
+
     function load_assets() {
         const cell_up = new Image();
         cell_up.src = "cell_up.png";
@@ -34,22 +37,26 @@ function botsweeper(canvas) {
 
     const assets = load_assets();
 
-    const width = 20;
-    const height = 20;
-    const mines = 99;
+    let width, height, mines, cursor_x, cursor_y, opening, dead, cheat;
 
-    canvas.width = width * 24;
-    canvas.height = height * 24;
-    canvas.tabIndex = 1000;
-    canvas.style.outline = "none";
+    function restart_with_parameters(parameters) {
+        width = parameters.width;
+        height = parameters.height;
+        mines = parameters.mines;
 
-    let cursor_x = 0;
-    let cursor_y = 0;
-    let opening = false;
-    let dead = false;
-    let cheat = false;
+        canvas.width = width * 24;
+        canvas.height = height * 24;
 
-    let board = build_board(width, height, mines);
+        cursor_x = Math.min(cursor_x, width - 1);
+        cursor_y = Math.min(cursor_y, height - 1);
+        opening = false;
+        dead = false;
+        cheat = false;
+
+        board = build_board(width, height, mines);
+    }
+
+    restart_with_parameters(parameters);
 
     const ctx = canvas.getContext("2d");
 
@@ -258,6 +265,8 @@ function botsweeper(canvas) {
 
     canvas.focus();
     run();
+
+    return { start: restart_with_parameters };
 }
 
 function build_board(width, height, mines) {
