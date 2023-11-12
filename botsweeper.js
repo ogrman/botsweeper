@@ -1,4 +1,6 @@
-function botsweeper(canvas, parameters) {
+"use strict";
+
+function botsweeper(canvas, initial_width, initial_height, initial_mines) {
     canvas.tabIndex = 1000;
     canvas.style.outline = "none";
 
@@ -37,12 +39,19 @@ function botsweeper(canvas, parameters) {
 
     const assets = load_assets();
 
-    let width, height, mines, cursor_x, cursor_y, opening, dead, cheat;
+    let width, height;      // Current size of the board
+    let mines;              // Number of mines on the board
+    let cursor_x, cursor_y; // Current cursor position
+    let show_cursor = true; // Whether or not the cursor should be drawn
+    let opening;            // Whether or not the button to open a cell is pressed
+    let dead;               // Whether or not the player is dead
+    let cheat;              // Whether or not the cheat button is pressed
+    let board = [];
 
-    function restart_with_parameters(parameters) {
-        width = parameters.width;
-        height = parameters.height;
-        mines = parameters.mines;
+    function restart_with_parameters(new_width, new_height, new_mines) {
+        width = new_width;
+        height = new_height;
+        mines = new_mines;
 
         canvas.width = width * 24;
         canvas.height = height * 24;
@@ -56,7 +65,7 @@ function botsweeper(canvas, parameters) {
         board = build_board(width, height, mines);
     }
 
-    restart_with_parameters(parameters);
+    restart_with_parameters(initial_width, initial_height, initial_mines);
 
     const ctx = canvas.getContext("2d");
 
@@ -129,6 +138,7 @@ function botsweeper(canvas, parameters) {
                 cursor_y = 0;
                 break;
         }
+        show_cursor = true;
         if (dead) {
             return;
         }
@@ -184,6 +194,7 @@ function botsweeper(canvas, parameters) {
         const { offsetX, offsetY } = event;
         cursor_x = Math.floor(offsetX / 24);
         cursor_y = Math.floor(offsetY / 24);
+        show_cursor = false;
     }
 
     function on_mouse_down(event) {
@@ -254,7 +265,7 @@ function botsweeper(canvas, parameters) {
                     draw(assets.flag);
                 }
 
-                if (cursor_x === x && cursor_y === y) {
+                if (show_cursor && cursor_x === x && cursor_y === y) {
                     draw(assets.cursor);
                 }
             }

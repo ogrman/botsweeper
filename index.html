@@ -39,7 +39,7 @@
             const controller = botsweeper(canvas, beginner);
 
             const start = (parameters) => {
-                controller.start(parameters);
+                controller.start(parameters.width, parameters.height, parameters.mines);
                 canvas.focus();
             };
 
