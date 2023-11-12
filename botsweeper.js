@@ -1,6 +1,9 @@
 "use strict";
 
-function botsweeper(canvas, initial_width, initial_height, initial_mines) {
+function botsweeper(
+    canvas,
+    update_time,
+) {
     canvas.tabIndex = 1000;
     canvas.style.outline = "none";
 
@@ -40,7 +43,9 @@ function botsweeper(canvas, initial_width, initial_height, initial_mines) {
     const assets = load_assets();
 
     let width, height;      // Current size of the board
-    let mines;              // Number of mines on the board
+    let mines;              // Number of mines on the board¨
+    let start_time;         // The time of the first click of this round
+    let seconds;            // The number of whole seconds since start_time
     let cursor_x, cursor_y; // Current cursor position
     let show_cursor = true; // Whether or not the cursor should be drawn
     let opening;            // Whether or not the button to open a cell is pressed
@@ -52,6 +57,10 @@ function botsweeper(canvas, initial_width, initial_height, initial_mines) {
         width = new_width;
         height = new_height;
         mines = new_mines;
+
+        start_time = null;
+        seconds = 0;
+        update_time(seconds);
 
         canvas.width = width * 24;
         canvas.height = height * 24;
@@ -65,8 +74,6 @@ function botsweeper(canvas, initial_width, initial_height, initial_mines) {
         board = build_board(width, height, mines);
     }
 
-    restart_with_parameters(initial_width, initial_height, initial_mines);
-
     const ctx = canvas.getContext("2d");
 
     function open() {
@@ -74,6 +81,10 @@ function botsweeper(canvas, initial_width, initial_height, initial_mines) {
 
         if (cell.is_flagged) {
             return;
+        }
+
+        if (start_time === null) {
+            start_time = Date.now();
         }
 
         open_cell(cell);
@@ -236,6 +247,15 @@ function botsweeper(canvas, initial_width, initial_height, initial_mines) {
     }, true);
 
     function run() {
+        if (start_time !== null) {
+            const now = Date.now();
+            const new_seconds = Math.floor((now - start_time) / 1000);
+            if (new_seconds > seconds) {
+                seconds = new_seconds;
+                update_time(seconds);
+            }
+        }
+
         for (let y = 0; y < height; ++y) {
             for (let x = 0; x < width; ++x) {
                 const px_x = x * 24;

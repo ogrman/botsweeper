@@ -23,6 +23,9 @@
         </p>
         <canvas width="500" height="500" id="game"></canvas>
         <div>
+            Time: <span id="timer">0</span> seconds
+        </div>
+        <div>
             Select board size:
             <button id="beginner">Beginner</button>
             <button id="intermediate">Intermediate</button>
@@ -35,8 +38,13 @@
             const advanced = { width: 30, height: 16, mines: 99 };
 
             const canvas = document.getElementById("game");
+            const timer = document.getElementById("timer");
 
-            const controller = botsweeper(canvas, beginner);
+            const update_timer = (seconds) => {
+                timer.innerHTML = seconds;
+            };
+
+            const controller = botsweeper(canvas, update_timer);
 
             const start = (parameters) => {
                 controller.start(parameters.width, parameters.height, parameters.mines);
