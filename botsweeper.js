@@ -43,7 +43,8 @@ function botsweeper(
     const assets = load_assets();
 
     let width, height;      // Current size of the board
-    let mines;              // Number of mines on the board¨
+    let mines;              // Number of mines on the board
+    let cells_left;         // Number of cells left to open
     let start_time;         // The time of the first click of this round
     let seconds;            // The number of whole seconds since start_time
     let cursor_x, cursor_y; // Current cursor position
@@ -57,6 +58,7 @@ function botsweeper(
         width = new_width;
         height = new_height;
         mines = new_mines;
+        cells_left = width * height - mines;
 
         start_time = null;
         seconds = 0;
@@ -97,6 +99,8 @@ function botsweeper(
 
             if (cell.is_mined) {
                 dead = true;
+            } else {
+                cells_left = cells_left - 1;
             }
 
             if (cell.neighboring_mines === 0) {
@@ -247,7 +251,7 @@ function botsweeper(
     }, true);
 
     function run() {
-        if (start_time !== null) {
+        if (start_time !== null && !dead && cells_left > 0) {
             const now = Date.now();
             const new_seconds = Math.floor((now - start_time) / 1000);
             if (new_seconds > seconds) {
